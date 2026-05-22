@@ -180,7 +180,7 @@ function renderLog(rows) {
   if (!rows.length) { box.innerHTML = '<p class="empty">記録はまだありません。</p>'; return; }
   const recent = rows.length > 30 ? rows.slice(-30) : rows;
   box.innerHTML = recent.map(r =>
-    `<div class="log-item">${esc(formatDateTime(r['日時']))}　${esc(r['更新者'])}：${esc(r['内容'])}</div>`
+    `<div class="log-item">${esc(formatDateTime(r['日時']))}　${esc(r['内容'])}</div>`
   ).join('');
 }
 
