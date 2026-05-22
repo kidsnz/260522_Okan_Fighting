@@ -170,9 +170,13 @@ function drawChart(sorted) {
 function renderRules(rows) {
   const box = document.getElementById('rulesBody');
   if (!rows.length) { box.innerHTML = '<p class="empty">ルールはまだありません。</p>'; return; }
-  box.innerHTML = rows.map(r =>
-    `<div class="rule"><div class="rule-cat">${esc(r['カテゴリ'])}</div><div>${esc(r['内容'])}</div></div>`
-  ).join('');
+  box.innerHTML = rows.map(r => {
+    const val = String(r['内容'] ?? '');
+    const content = val.startsWith('http')
+      ? `<a href="${esc(val)}" target="_blank" rel="noopener">${esc(val)}</a>`
+      : esc(val);
+    return `<div class="rule"><div class="rule-cat">${esc(r['カテゴリ'])}</div><div>${content}</div></div>`;
+  }).join('');
 }
 
 function renderLog(rows) {
