@@ -1,0 +1,130 @@
+:root {
+  --bg: #fcf6ec;
+  --card: #ffffff;
+  --ink: #4a4038;
+  --ink-soft: #8a7d70;
+  --accent: #7caa6e;
+  --accent-dark: #5c8a4f;
+  --line: #ece3d5;
+  --shadow: 0 4px 14px rgba(120, 100, 70, 0.10);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+[hidden] { display: none !important; }
+
+body {
+  font-family: -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic", Meiryo, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.7;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* ===== ログイン ===== */
+.login-screen {
+  position: fixed; inset: 0; z-index: 10;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg); padding: 1.5rem;
+}
+.login-screen[hidden] { display: none; }
+.login-card {
+  background: var(--card); border-radius: 1.5rem; padding: 2.5rem 2rem;
+  box-shadow: var(--shadow); text-align: center; width: 100%; max-width: 360px;
+}
+.login-emoji { font-size: 3rem; }
+.login-card h1 { font-size: 1.2rem; margin: 0.75rem 0 1.25rem; color: var(--accent-dark); }
+.login-note { font-size: 0.9rem; color: var(--ink-soft); margin-bottom: 1rem; }
+.login-card input {
+  width: 100%; padding: 0.85rem; font-size: 1rem; text-align: center;
+  border: 2px solid var(--line); border-radius: 0.85rem; margin-bottom: 1rem;
+}
+.login-card input:focus { outline: none; border-color: var(--accent); }
+#loginBtn {
+  width: 100%; padding: 0.85rem; font-size: 1rem; font-weight: 700;
+  background: var(--accent); color: #fff; border: none; border-radius: 0.85rem;
+  cursor: pointer;
+}
+#loginBtn:active { background: var(--accent-dark); }
+.login-error { color: #c0584b; font-size: 0.85rem; margin-top: 0.75rem; min-height: 1.2em; }
+
+/* ===== レイアウト ===== */
+main { max-width: 640px; margin: 0 auto; padding: 1.25rem 1rem 3rem; }
+.site-header { text-align: center; padding: 1rem 0 0.5rem; }
+.header-emoji { font-size: 2.2rem; }
+.site-header h1 { font-size: 1.3rem; color: var(--accent-dark); margin-top: 0.2rem; }
+.last-updated { font-size: 0.8rem; color: var(--ink-soft); margin-top: 0.25rem; }
+
+.card {
+  background: var(--card); border-radius: 1.25rem; padding: 1.25rem 1.15rem;
+  box-shadow: var(--shadow); margin-top: 1.1rem;
+}
+.card h2 { font-size: 1.05rem; color: var(--accent-dark); margin-bottom: 0.75rem; }
+.card-body { font-size: 0.95rem; }
+.empty { color: var(--ink-soft); font-size: 0.88rem; padding: 0.5rem 0; }
+
+.preview-banner {
+  background: #fff3d6; color: #9a7b2e; font-size: 0.76rem; text-align: center;
+  padding: 0.5rem 0.75rem; border-radius: 0.75rem; margin-top: 0.5rem;
+}
+
+/* ===== 状態 ===== */
+.kv { display: flex; padding: 0.45rem 0; border-bottom: 1px dashed var(--line); }
+.kv:last-child { border-bottom: none; }
+.kv-key { flex: 0 0 6.5rem; color: var(--ink-soft); font-size: 0.85rem; }
+.kv-val { flex: 1; }
+
+/* ===== スケジュール ===== */
+.event { display: flex; gap: 0.75rem; padding: 0.55rem 0; border-bottom: 1px dashed var(--line); }
+.event:last-child { border-bottom: none; }
+.event-date {
+  flex: 0 0 4.2rem; text-align: center; background: #f3ede0; border-radius: 0.6rem;
+  padding: 0.35rem 0.2rem; font-size: 0.82rem; font-weight: 700; color: var(--accent-dark);
+  height: fit-content;
+}
+.event-body { flex: 1; }
+.event-title { font-weight: 700; }
+.event-kind {
+  font-size: 0.7rem; background: var(--accent); color: #fff;
+  padding: 0.05rem 0.5rem; border-radius: 1rem; margin-left: 0.3rem; white-space: nowrap;
+}
+.event-detail { font-size: 0.85rem; color: var(--ink-soft); }
+
+/* ===== 採血 ===== */
+.chart-wrap { margin: 0.25rem 0 1rem; }
+table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+th, td { padding: 0.4rem 0.25rem; text-align: center; border-bottom: 1px solid var(--line); }
+th { color: var(--ink-soft); font-weight: 600; }
+
+/* ===== ルール ===== */
+.rule { padding: 0.5rem 0; border-bottom: 1px dashed var(--line); }
+.rule:last-child { border-bottom: none; }
+.rule-cat { font-size: 0.78rem; font-weight: 700; color: var(--accent-dark); }
+
+/* ===== ログ ===== */
+.log-item {
+  font-size: 0.83rem; color: var(--ink-soft);
+  padding: 0.32rem 0; border-bottom: 1px dashed var(--line);
+}
+.log-item:last-child { border-bottom: none; }
+
+/* ===== フッター ===== */
+.site-footer { text-align: center; margin-top: 2rem; color: var(--ink-soft); font-size: 0.82rem; }
+.logout-btn {
+  margin-top: 0.8rem; background: none; border: 1px solid var(--line);
+  color: var(--ink-soft); padding: 0.4rem 1rem; border-radius: 1rem; cursor: pointer;
+}
+
+/* ===== PC（広い画面）レイアウト：2カラム ===== */
+@media (min-width: 920px) {
+  main { max-width: 1100px; }
+
+  #app:not([hidden]) {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.1rem;
+    align-items: start;
+  }
+  #app > * { margin-top: 0; }
+  .preview-banner, .site-header, .site-footer,
+  #card-status { grid-column: 1 / -1; }
+}

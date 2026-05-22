@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>おかん、ファイティング！</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ログイン画面 -->
+  <div id="login" class="login-screen">
+    <div class="login-card">
+      <div class="login-emoji">🌷</div>
+      <h1>おかん、<br>ファイティング！</h1>
+      <p class="login-note">合言葉を入力してください</p>
+      <input type="password" id="password" placeholder="合言葉" autocomplete="current-password">
+      <button id="loginBtn">ひらく</button>
+      <p id="loginError" class="login-error"></p>
+    </div>
+  </div>
+
+  <!-- メイン -->
+  <main id="app" hidden>
+    <header class="site-header">
+      <div class="header-emoji">🌷</div>
+      <h1>おかん、ファイティング！</h1>
+      <p id="lastUpdated" class="last-updated"></p>
+    </header>
+
+    <section class="card" id="card-status">
+      <h2>🏥 いまの状態</h2>
+      <div id="statusBody" class="card-body"></div>
+    </section>
+
+    <section class="card" id="card-schedule">
+      <h2>📅 治療スケジュール</h2>
+      <div id="scheduleBody" class="card-body"></div>
+    </section>
+
+    <section class="card" id="card-lab">
+      <h2>💉 採血結果</h2>
+      <div class="chart-wrap"><canvas id="labChart"></canvas></div>
+      <div id="labTable" class="card-body"></div>
+    </section>
+
+    <section class="card" id="card-rules">
+      <h2>📞 連絡・面会のルール</h2>
+      <div id="rulesBody" class="card-body"></div>
+    </section>
+
+    <section class="card" id="card-log">
+      <h2>📝 更新の記録</h2>
+      <div id="logBody" class="card-body"></div>
+    </section>
+
+    <footer class="site-footer">
+      <p>村上家のみんなで、おかんの回復を見守るためのページです。</p>
+      <button id="logoutBtn" class="logout-btn">ログアウト</button>
+    </footer>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="sample-data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
