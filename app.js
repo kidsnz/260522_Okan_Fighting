@@ -178,7 +178,7 @@ function renderRules(rows) {
 function renderLog(rows) {
   const box = document.getElementById('logBody');
   if (!rows.length) { box.innerHTML = '<p class="empty">記録はまだありません。</p>'; return; }
-  const recent = [...rows].reverse().slice(0, 15);
+  const recent = rows.length > 30 ? rows.slice(-30) : rows;
   box.innerHTML = recent.map(r =>
     `<div class="log-item">${esc(formatDateTime(r['日時']))}　${esc(r['更新者'])}：${esc(r['内容'])}</div>`
   ).join('');
@@ -200,5 +200,7 @@ function formatDate(v) {
 }
 
 function formatDateTime(v) {
-  return v ? String(v) : '';
+  if (!v) return '';
+  const m = String(v).match(/(\d{4})-(\d{1,2})-(\d{1,2})/);
+  return m ? `${m[1]}年${parseInt(m[2])}月${parseInt(m[3])}日` : String(v);
 }
