@@ -1,4 +1,4 @@
-/* おかん、ファイティング！ — フロントエンド */
+/* おかん、ガンバレ！ — フロントエンド */
 
 /* ▼▼ GAS をデプロイして発行された Web App URL をここに貼る ▼▼ */
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbx6JyFkScT1j4QY13L2Sf21cIiAw5dsrzfieURiH_10D1sxpVjIoK4Hnx_T6gzPy9a5/exec';
