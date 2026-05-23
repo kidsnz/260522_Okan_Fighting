@@ -185,7 +185,7 @@ function renderLog(rows) {
   const sorted = [...rows].sort((a, b) => String(b['日時']).localeCompare(String(a['日時'])));
   const recent = sorted.slice(0, 30);
   box.innerHTML = recent.map(r =>
-    `<div class="log-item">${esc(formatDateTime(r['日時']))}　${esc(r['内容'])}</div>`
+    `<div class="log-item"><span class="log-date">${esc(formatDateTime(r['日時']))}</span>　${esc(r['内容'])}</div>`
   ).join('');
 }
 

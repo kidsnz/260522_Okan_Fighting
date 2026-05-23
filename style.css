@@ -119,6 +119,7 @@ th { color: var(--ink-soft); font-weight: 600; }
   padding: 0.32rem 0; border-bottom: 1px dashed var(--line);
 }
 .log-item:last-child { border-bottom: none; }
+.log-date { font-weight: bold; color: var(--ink); }
 
 /* ===== フッター ===== */
 .site-footer { text-align: center; margin-top: 2rem; color: var(--ink-soft); font-size: 0.82rem; }
