@@ -10,6 +10,7 @@
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
+
 [hidden] { display: none !important; }
 
 body {
@@ -31,7 +32,7 @@ body {
   background: var(--card); border-radius: 1.5rem; padding: 2.5rem 2rem;
   box-shadow: var(--shadow); text-align: center; width: 100%; max-width: 360px;
 }
-.login-emoji { font-size: 3rem; }
+.login-illust { width: 210px; margin-bottom: -0.5rem; }
 .login-card h1 { font-size: 1.2rem; margin: 0.75rem 0 1.25rem; color: var(--accent-dark); }
 .login-note { font-size: 0.9rem; color: var(--ink-soft); margin-bottom: 1rem; }
 .login-card input {
@@ -49,7 +50,8 @@ body {
 
 /* ===== レイアウト ===== */
 main { max-width: 640px; margin: 0 auto; padding: 1.25rem 1rem 3rem; }
-.site-header { text-align: center; padding: 1rem 0 0.5rem; }
+.site-header { text-align: center; padding: 0; }
+.header-group-img { width: 200px; max-width: 80%; margin-top: -1rem; margin-bottom: -1.25rem; }
 .header-emoji { font-size: 2.2rem; }
 .site-header h1 { font-size: 1.3rem; color: var(--accent-dark); margin-top: 0.2rem; }
 .site-tagline { font-size: 0.88rem; color: var(--ink-soft); margin-top: 0.2rem; }
