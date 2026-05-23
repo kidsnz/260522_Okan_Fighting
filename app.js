@@ -119,7 +119,7 @@ function renderStatus(rows) {
 function renderSchedule(rows) {
   const box = document.getElementById('scheduleBody');
   if (!rows.length) { box.innerHTML = '<p class="empty">予定はまだありません。</p>'; return; }
-  const sorted = [...rows].sort((a, b) => String(a['日付']).localeCompare(String(b['日付'])));
+  const sorted = [...rows].sort((a, b) => String(b['日付']).localeCompare(String(a['日付'])));
   box.innerHTML = sorted.map(r =>
     `<div class="event">
       <div class="event-date">${esc(formatDate(r['日付']))}</div>
@@ -182,7 +182,8 @@ function renderRules(rows) {
 function renderLog(rows) {
   const box = document.getElementById('logBody');
   if (!rows.length) { box.innerHTML = '<p class="empty">記録はまだありません。</p>'; return; }
-  const recent = rows.length > 30 ? rows.slice(-30) : rows;
+  const sorted = [...rows].sort((a, b) => String(b['日時']).localeCompare(String(a['日時'])));
+  const recent = sorted.slice(0, 30);
   box.innerHTML = recent.map(r =>
     `<div class="log-item">${esc(formatDateTime(r['日時']))}　${esc(r['内容'])}</div>`
   ).join('');
