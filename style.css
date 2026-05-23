@@ -115,11 +115,11 @@ th { color: var(--ink-soft); font-weight: 600; }
 
 /* ===== ログ ===== */
 .log-item {
-  font-size: 0.83rem; color: var(--ink-soft);
+  font-size: 0.83rem; color: var(--ink);
   padding: 0.32rem 0; border-bottom: 1px dashed var(--line);
 }
 .log-item:last-child { border-bottom: none; }
-.log-date { font-weight: bold; color: var(--ink); }
+.log-date { color: var(--ink-soft); }
 
 /* ===== フッター ===== */
 .site-footer { text-align: center; margin-top: 2rem; color: var(--ink-soft); font-size: 0.82rem; }
