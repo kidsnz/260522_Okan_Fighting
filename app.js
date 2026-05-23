@@ -137,9 +137,9 @@ function renderLab(rows) {
   const sorted = [...rows].sort((a, b) => String(a['採血日']).localeCompare(String(b['採血日'])));
   const recent = [...sorted].reverse();
   box.innerHTML =
-    '<table><thead><tr><th>採血日</th><th>WBC</th><th>好中球</th><th>血小板</th><th>Hb</th><th>CRP</th></tr></thead><tbody>' +
+    '<table><thead><tr><th>採血日</th><th>白血球数（WBC）</th><th>好中球（NEUT）</th><th>血小板数（PLT）</th><th>ヘモグロビン（Hb）</th><th>炎症反応（CRP）</th></tr></thead><tbody>' +
     recent.map(r =>
-      `<tr><td>${esc(formatDate(r['採血日']))}</td><td>${esc(r['WBC'])}</td><td>${esc(r['好中球'])}</td><td>${esc(r['血小板'])}</td><td>${esc(r['ヘモグロビン'])}</td><td>${esc(r['CRP'] ?? '—')}</td></tr>`
+      `<tr><td>${esc(formatDate(r['採血日']))}</td><td>${esc(r['白血球数（WBC）'])}</td><td>${esc(r['好中球（NEUT）'] ?? '—')}</td><td>${esc(r['血小板数（PLT）'])}</td><td>${esc(r['ヘモグロビン（Hb / HGB）'])}</td><td>${esc(r['炎症反応（CRP）'] ?? '—')}</td></tr>`
     ).join('') +
     '</tbody></table>';
   drawChart(sorted);
@@ -155,8 +155,8 @@ function drawChart(sorted) {
     data: {
       labels: sorted.map(r => formatDate(r['採血日'])),
       datasets: [
-        { label: 'WBC（白血球）', data: sorted.map(r => num(r['WBC'])), borderColor: '#7caa6e', backgroundColor: '#7caa6e', tension: 0.3 },
-        { label: '好中球', data: sorted.map(r => num(r['好中球'])), borderColor: '#d9914a', backgroundColor: '#d9914a', tension: 0.3 },
+        { label: '白血球数（WBC）', data: sorted.map(r => num(r['白血球数（WBC）'])), borderColor: '#7caa6e', backgroundColor: '#7caa6e', tension: 0.3 },
+        { label: 'ヘモグロビン（Hb）', data: sorted.map(r => num(r['ヘモグロビン（Hb / HGB）'])), borderColor: '#d9914a', backgroundColor: '#d9914a', tension: 0.3 },
       ],
     },
     options: {
