@@ -4,7 +4,7 @@
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbx6JyFkScT1j4QY13L2Sf21cIiAw5dsrzfieURiH_10D1sxpVjIoK4Hnx_T6gzPy9a5/exec';
 /* ▲▲ 例: https://script.google.com/macros/s/XXXXXXXX/exec ▲▲ */
 
-const AUTH_KEY = 'okan_fighting_auth';
+const AUTH_KEY = 'okan_ganbare_auth';
 const AUTH_DAYS = 30;
 
 const PLACEHOLDER_URL = 'PASTE_YOUR_GAS_WEB_APP_URL_HERE';
