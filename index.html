@@ -44,6 +44,18 @@
       <h2>💉 採血結果</h2>
       <div class="chart-wrap"><canvas id="labChart"></canvas></div>
       <div id="labTable" class="card-body"></div>
+      <div class="lab-legend">
+        <table>
+          <thead><tr><th>項目</th><th>意味</th></tr></thead>
+          <tbody>
+            <tr><td>白血球数（WBC）</td><td>白血病細胞の動き・治療反応</td></tr>
+            <tr><td>好中球（NEUT）</td><td>感染防御力（500以下で感染リスク大）</td></tr>
+            <tr><td>血小板数（PLT）</td><td>出血リスク→輸血判断（血小板輸血）</td></tr>
+            <tr><td>ヘモグロビン（Hb）</td><td>貧血→輸血判断（赤血球輸血）</td></tr>
+            <tr><td>炎症反応（CRP）</td><td>感染・炎症の指標</td></tr>
+          </tbody>
+        </table>
+      </div>
     </section>
 
     <section class="card" id="card-rules">

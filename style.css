@@ -98,6 +98,16 @@ table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
 th, td { padding: 0.4rem 0.25rem; text-align: center; border-bottom: 1px solid var(--line); }
 th { color: var(--ink-soft); font-weight: 600; }
 
+/* ===== 採血凡例 ===== */
+.lab-legend {
+  margin-top: 0.9rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--line);
+}
+.lab-legend table { font-size: 0.76rem; color: var(--ink-soft); }
+.lab-legend th { color: var(--ink-soft); font-size: 0.74rem; font-weight: 600; }
+.lab-legend td:first-child { font-weight: 600; white-space: nowrap; }
+
 /* ===== ルール ===== */
 .rule { padding: 0.5rem 0; border-bottom: 1px dashed var(--line); }
 .rule:last-child { border-bottom: none; }
