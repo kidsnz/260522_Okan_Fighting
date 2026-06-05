@@ -75,6 +75,7 @@ main { max-width: 640px; margin: 0 auto; padding: 1.25rem 1rem 3rem; }
 .kv:last-child { border-bottom: none; }
 .kv-key { flex: 0 0 6.5rem; color: var(--ink-soft); font-size: 0.85rem; }
 .kv-val { flex: 1; }
+.kv-upd { display: block; margin-top: 0.15rem; color: var(--ink-soft); font-size: 0.72rem; }
 
 /* ===== スケジュール ===== */
 .event { display: flex; gap: 0.75rem; padding: 0.55rem 0; border-bottom: 1px dashed var(--line); }

@@ -111,9 +111,12 @@ function esc(s) {
 function renderStatus(rows) {
   const box = document.getElementById('statusBody');
   if (!rows.length) { box.innerHTML = '<p class="empty">まだ情報がありません。</p>'; return; }
-  box.innerHTML = rows.map(r =>
-    `<div class="kv"><div class="kv-key">${esc(r['項目'])}</div><div class="kv-val">${esc(r['内容'])}</div></div>`
-  ).join('');
+  box.innerHTML = rows.map(r => {
+    const upd = r['更新日時']
+      ? `<span class="kv-upd">${esc(formatDate(r['更新日時']))}更新</span>`
+      : '';
+    return `<div class="kv"><div class="kv-key">${esc(r['項目'])}</div><div class="kv-val">${esc(r['内容'])}${upd}</div></div>`;
+  }).join('');
 }
 
 function renderSchedule(rows) {
