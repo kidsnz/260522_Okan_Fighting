@@ -76,6 +76,12 @@ main { max-width: 640px; margin: 0 auto; padding: 1.25rem 1rem 3rem; }
 .kv-key { flex: 0 0 6.5rem; color: var(--ink-soft); font-size: 0.85rem; }
 .kv-val { flex: 1; }
 .kv-upd { display: block; margin-top: 0.15rem; color: var(--ink-soft); font-size: 0.72rem; }
+.status-group { margin-bottom: 0.85rem; }
+.status-group:last-child { margin-bottom: 0; }
+.status-cat {
+  font-size: 0.8rem; font-weight: 700; color: var(--accent-dark);
+  margin: 0 0 0.15rem; padding-bottom: 0.15rem; border-bottom: 1px solid var(--line);
+}
 
 /* ===== スケジュール ===== */
 .event { display: flex; gap: 0.75rem; padding: 0.55rem 0; border-bottom: 1px dashed var(--line); }

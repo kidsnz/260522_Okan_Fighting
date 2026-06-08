@@ -108,14 +108,56 @@ function esc(s) {
   return String(s ?? '').replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
 }
 
+/* カテゴリの表示順（固定）。ここに無いカテゴリは後ろにまとめる */
+const STATUS_CATEGORY_ORDER = ['サマリー', '治療', '症状', '生活'];
+/* このカテゴリは、一定日数 言及がなければ自動で「いまの状態」から隠す（落ち着いたとみなす） */
+const STATUS_AGING_CATEGORIES = ['症状', '生活'];
+const STATUS_FRESH_DAYS = 7;
+
+function parseYmd(v) {
+  const m = String(v ?? '').match(/(\d{4})-(\d{1,2})-(\d{1,2})/);
+  return m ? new Date(+m[1], +m[2] - 1, +m[3]) : null;
+}
+
 function renderStatus(rows) {
   const box = document.getElementById('statusBody');
-  if (!rows.length) { box.innerHTML = '<p class="empty">まだ情報がありません。</p>'; return; }
-  box.innerHTML = rows.map(r => {
-    const upd = r['更新日時']
-      ? `<span class="kv-upd">${esc(formatDate(r['更新日時']))}更新</span>`
-      : '';
-    return `<div class="kv"><div class="kv-key">${esc(r['項目'])}</div><div class="kv-val">${esc(r['内容'])}${upd}</div></div>`;
+  // 基準日＝状態の最新更新日。今日ではなくこれを使うので、更新が途絶えても全部は消えない
+  const refDate = rows.reduce((mx, r) => {
+    const d = parseYmd(r['更新日時']);
+    return d && (!mx || d > mx) ? d : mx;
+  }, null);
+
+  const active = rows.filter(r => {
+    // ① 明示的に「解決」したものは隠す（シートには履歴として残る）
+    if (String(r['状態'] ?? '') === '解決') return false;
+    // ② 症状・生活は、基準日から一定日数 言及がなければ自動で隠す（誰も宣言しなくてOK）
+    if (refDate && STATUS_AGING_CATEGORIES.includes(r['カテゴリ'])) {
+      const d = parseYmd(r['更新日時']);
+      if (d && (refDate - d) / 86400000 > STATUS_FRESH_DAYS) return false;
+    }
+    return true;
+  });
+  if (!active.length) { box.innerHTML = '<p class="empty">まだ情報がありません。</p>'; return; }
+
+  // カテゴリでグループ化（カテゴリ未設定は「その他」）
+  const groups = {};
+  active.forEach(r => {
+    const cat = r['カテゴリ'] || 'その他';
+    (groups[cat] = groups[cat] || []).push(r);
+  });
+  const cats = [
+    ...STATUS_CATEGORY_ORDER,
+    ...Object.keys(groups).filter(c => !STATUS_CATEGORY_ORDER.includes(c)),
+  ].filter(c => groups[c]);
+
+  box.innerHTML = cats.map(cat => {
+    const items = groups[cat].map(r => {
+      const upd = r['更新日時']
+        ? `<span class="kv-upd">${esc(formatDate(r['更新日時']))}更新</span>`
+        : '';
+      return `<div class="kv"><div class="kv-key">${esc(r['項目'])}</div><div class="kv-val">${esc(r['内容'])}${upd}</div></div>`;
+    }).join('');
+    return `<div class="status-group"><h3 class="status-cat">${esc(cat)}</h3>${items}</div>`;
   }).join('');
 }
 
