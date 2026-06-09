@@ -153,9 +153,9 @@ function renderStatus(rows) {
   box.innerHTML = cats.map(cat => {
     const items = groups[cat].map(r => {
       const upd = r['更新日時']
-        ? `<span class="kv-upd">${esc(formatDate(r['更新日時']))}更新</span>`
+        ? `<span class="kv-upd">（${esc(formatDate(r['更新日時']))}更新）</span>`
         : '';
-      return `<div class="kv"><div class="kv-key">${esc(r['項目'])}</div><div class="kv-val">${esc(r['内容'])}${upd}</div></div>`;
+      return `<div class="kv"><div class="kv-key">${esc(r['項目'])}${upd}</div><div class="kv-val">${esc(r['内容'])}</div></div>`;
     }).join('');
     return `<div class="status-group"><h3 class="status-cat">${esc(cat)}</h3>${items}</div>`;
   }).join('');
