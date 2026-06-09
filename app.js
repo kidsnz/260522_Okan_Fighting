@@ -100,7 +100,7 @@ function render(data) {
   renderSchedule(data.schedule || []);
   renderLab(data.labResults || []);
   renderRules(data.rules || []);
-  renderLog(data.log || []);
+  renderLog(data.log || [], data.photos || []);
   renderLastUpdated(data);
 }
 
@@ -230,14 +230,59 @@ function renderRules(rows) {
   }).join('');
 }
 
-function renderLog(rows) {
+/* 日付文字列 → "YYYY-MM-DD"（ログと写真の日付照合用） */
+function ymdKey(v) {
+  const m = String(v ?? '').match(/(\d{4})-(\d{1,2})-(\d{1,2})/);
+  return m ? `${m[1]}-${String(+m[2]).padStart(2, '0')}-${String(+m[3]).padStart(2, '0')}` : '';
+}
+
+function renderLog(rows, photos) {
   const box = document.getElementById('logBody');
   if (!rows.length) { box.innerHTML = '<p class="empty">記録はまだありません。</p>'; return; }
   const sorted = [...rows].sort((a, b) => String(b['日時']).localeCompare(String(a['日時'])));
   const recent = sorted.slice(0, 30);
-  box.innerHTML = recent.map(r =>
-    `<div class="log-item"><span class="log-date">${esc(formatDateTime(r['日時']))}</span>　${esc(r['内容'])}</div>`
-  ).join('');
+  box.innerHTML = recent.map(r => {
+    // その日の写真を番号順に並べてログの下に表示
+    const dateKey = ymdKey(r['日時']);
+    const dayPhotos = (photos || [])
+      .filter(p => ymdKey(p.date) === dateKey)
+      .sort((a, b) => (a.order || 0) - (b.order || 0));
+    const photoHtml = dayPhotos.length
+      ? `<div class="log-photos">` + dayPhotos.map(p =>
+          `<figure class="log-photo">` +
+          `<img src="${esc(p.thumb)}" alt="${esc(p.caption || '')}" loading="lazy" data-full="${esc(p.full)}" data-caption="${esc(p.caption || '')}">` +
+          (p.caption ? `<figcaption>${esc(p.caption)}</figcaption>` : '') +
+          `</figure>`
+        ).join('') + `</div>`
+      : '';
+    return `<div class="log-item"><span class="log-date">${esc(formatDateTime(r['日時']))}</span>　${esc(r['内容'])}${photoHtml}</div>`;
+  }).join('');
+  attachPhotoLightbox(box);
+}
+
+/* 写真サムネイルをタップ → 拡大表示（オーバーレイ） */
+function attachPhotoLightbox(container) {
+  container.querySelectorAll('.log-photo img').forEach(img => {
+    img.addEventListener('click', () => openLightbox(img.dataset.full, img.dataset.caption));
+  });
+}
+
+function openLightbox(src, caption) {
+  let lb = document.getElementById('lightbox');
+  if (!lb) {
+    lb = document.createElement('div');
+    lb.id = 'lightbox';
+    lb.className = 'lightbox';
+    lb.hidden = true;
+    lb.addEventListener('click', () => { lb.hidden = true; });
+    document.body.appendChild(lb);
+  }
+  lb.innerHTML =
+    `<div class="lightbox-inner">` +
+    `<img src="${esc(src)}" alt="${esc(caption || '')}">` +
+    (caption ? `<p class="lightbox-cap">${esc(caption)}</p>` : '') +
+    `</div>`;
+  lb.hidden = false;
 }
 
 function renderLastUpdated(data) {
