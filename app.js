@@ -207,6 +207,7 @@ function drawChart(sorted) {
       datasets: [
         { label: '白血球数（WBC）', data: sorted.map(r => num(r['白血球数（WBC）'])), borderColor: '#7caa6e', backgroundColor: '#7caa6e', tension: 0.3 },
         { label: 'ヘモグロビン（Hb）', data: sorted.map(r => num(r['ヘモグロビン（Hb / HGB）'])), borderColor: '#d9914a', backgroundColor: '#d9914a', tension: 0.3 },
+        { label: '血小板数（PLT）', data: sorted.map(r => num(r['血小板数（PLT）'])), borderColor: '#5b8fb0', backgroundColor: '#5b8fb0', tension: 0.3 },
       ],
     },
     options: {
