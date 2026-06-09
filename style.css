@@ -105,6 +105,15 @@ table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
 th, td { padding: 0.4rem 0.25rem; text-align: center; border-bottom: 1px solid var(--line); }
 th { color: var(--ink-soft); font-weight: 600; }
 
+/* 採血結果の表が画面に収まらない時はカード内で横スクロール（はみ出し防止） */
+#labTable { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+/* スマホでは文字と余白を詰めて、なるべくスクロールせず収まるように */
+@media (max-width: 480px) {
+  #labTable table { font-size: 0.72rem; }
+  #labTable th, #labTable td { padding: 0.35rem 0.1rem; }
+}
+
 /* ===== 採血凡例 ===== */
 .lab-legend {
   margin-top: 0.9rem;
