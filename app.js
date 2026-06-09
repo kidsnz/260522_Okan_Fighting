@@ -184,9 +184,11 @@ function renderLab(rows) {
   box.innerHTML =
     '<table><thead><tr><th>採血日</th><th>白血球数（WBC）</th><th>好中球（NEUT）</th><th>血小板数（PLT）</th><th>ヘモグロビン（Hb）</th><th>炎症反応（CRP）</th><th>芽球（%）</th></tr></thead><tbody>' +
     recent.map(r => {
-      // 芽球は測った日だけ。未測定は「—」（0と区別する）。列名のゆれにも対応
-      const blast = r['芽球（%）'] ?? r['芽球'] ?? r['芽球(%)'] ?? '';
-      const blastCell = (blast === '') ? '—' : esc(blast);
+      // 芽球は測った日だけ。未測定は「—」（0と区別する）。
+      // 列名に空白や全角/半角のゆれがあっても拾えるよう「芽球」を含む列を探す
+      const blastKey = Object.keys(r).find(k => k.includes('芽球'));
+      const blast = blastKey ? r[blastKey] : '';
+      const blastCell = (blast === '' || blast == null) ? '—' : esc(blast);
       return `<tr><td>${esc(formatDate(r['採血日']))}</td><td>${esc(r['白血球数（WBC）'])}</td><td>${esc(r['好中球（NEUT）'] ?? '—')}</td><td>${esc(r['血小板数（PLT）'])}</td><td>${esc(r['ヘモグロビン（Hb / HGB）'])}</td><td>${esc(r['炎症反応（CRP）'] ?? '—')}</td><td>${blastCell}</td></tr>`;
     }).join('') +
     '</tbody></table>';
