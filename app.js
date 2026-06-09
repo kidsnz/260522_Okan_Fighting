@@ -7,6 +7,10 @@ const GAS_URL = 'https://script.google.com/macros/s/AKfycbx6JyFkScT1j4QY13L2Sf21
 const AUTH_KEY = 'okan_ganbare_auth';
 const AUTH_DAYS = 30;
 
+/* 毎日の様子（ログ）の表示件数。
+   初期表示も「もっと見る」で増える件数も、両方この数字。ここを変えるだけでOK。 */
+const LOG_PAGE_SIZE = 7;
+
 const PLACEHOLDER_URL = 'PASTE_YOUR_GAS_WEB_APP_URL_HERE';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -248,27 +252,56 @@ function ymdKey(v) {
   return m ? `${m[1]}-${String(+m[2]).padStart(2, '0')}-${String(+m[3]).padStart(2, '0')}` : '';
 }
 
+/* ログ用の状態（もっと見るで増やす現在の表示件数を保持） */
+let logSorted = [];
+let logPhotos = [];
+let logShownCount = 0;
+
+function logItemHtml(r) {
+  // その日の写真を番号順に並べてログの下に表示
+  const dateKey = ymdKey(r['日時']);
+  const dayPhotos = (logPhotos || [])
+    .filter(p => ymdKey(p.date) === dateKey)
+    .sort((a, b) => (a.order || 0) - (b.order || 0));
+  const photoHtml = dayPhotos.length
+    ? `<div class="log-photos">` + dayPhotos.map(p =>
+        `<figure class="log-photo">` +
+        `<img src="${esc(p.thumb)}" alt="${esc(p.caption || '')}" loading="lazy" data-full="${esc(p.full)}" data-caption="${esc(p.caption || '')}">` +
+        (p.caption ? `<figcaption>${esc(p.caption)}</figcaption>` : '') +
+        `</figure>`
+      ).join('') + `</div>`
+    : '';
+  return `<div class="log-item"><span class="log-date">${esc(formatDateTime(r['日時']))}</span>　${esc(r['内容'])}${photoHtml}</div>`;
+}
+
 function renderLog(rows, photos) {
   const box = document.getElementById('logBody');
   if (!rows.length) { box.innerHTML = '<p class="empty">記録はまだありません。</p>'; return; }
-  const sorted = [...rows].sort((a, b) => String(b['日時']).localeCompare(String(a['日時'])));
-  const recent = sorted.slice(0, 30);
-  box.innerHTML = recent.map(r => {
-    // その日の写真を番号順に並べてログの下に表示
-    const dateKey = ymdKey(r['日時']);
-    const dayPhotos = (photos || [])
-      .filter(p => ymdKey(p.date) === dateKey)
-      .sort((a, b) => (a.order || 0) - (b.order || 0));
-    const photoHtml = dayPhotos.length
-      ? `<div class="log-photos">` + dayPhotos.map(p =>
-          `<figure class="log-photo">` +
-          `<img src="${esc(p.thumb)}" alt="${esc(p.caption || '')}" loading="lazy" data-full="${esc(p.full)}" data-caption="${esc(p.caption || '')}">` +
-          (p.caption ? `<figcaption>${esc(p.caption)}</figcaption>` : '') +
-          `</figure>`
-        ).join('') + `</div>`
-      : '';
-    return `<div class="log-item"><span class="log-date">${esc(formatDateTime(r['日時']))}</span>　${esc(r['内容'])}${photoHtml}</div>`;
-  }).join('');
+  logSorted = [...rows].sort((a, b) => String(b['日時']).localeCompare(String(a['日時'])));
+  logPhotos = photos || [];
+  logShownCount = LOG_PAGE_SIZE;   // 初期表示
+  paintLog();
+}
+
+/* 現在の表示件数ぶんを描画し、続きがあれば「もっと見る」ボタンを出す */
+function paintLog() {
+  const box = document.getElementById('logBody');
+  const shown = logSorted.slice(0, logShownCount);
+  let html = shown.map(logItemHtml).join('');
+
+  const remaining = logSorted.length - shown.length;
+  if (remaining > 0) {
+    html += `<button type="button" class="log-more" id="logMoreBtn">もっと見る（あと${remaining}日分）</button>`;
+  }
+  box.innerHTML = html;
+
+  const moreBtn = document.getElementById('logMoreBtn');
+  if (moreBtn) {
+    moreBtn.addEventListener('click', () => {
+      logShownCount += LOG_PAGE_SIZE;   // 次のぶんを追加
+      paintLog();
+    });
+  }
   attachPhotoLightbox(box);
 }
 
