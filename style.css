@@ -137,6 +137,15 @@ th { color: var(--ink-soft); font-weight: 600; }
 .log-item:last-child { border-bottom: none; }
 .log-date { color: var(--ink-soft); }
 
+/* もっと見るボタン */
+.log-more {
+  display: block; width: 100%; margin-top: 0.75rem;
+  padding: 0.6rem; border: 1px solid var(--line); border-radius: 0.85rem;
+  background: var(--bg); color: var(--accent-dark);
+  font-size: 0.85rem; font-weight: 700; cursor: pointer;
+}
+.log-more:active { background: var(--line); }
+
 /* ログ内の写真 */
 .log-photos { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.5rem 0 0.15rem; }
 .log-photo { margin: 0; width: 120px; }
