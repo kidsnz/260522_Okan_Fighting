@@ -113,6 +113,10 @@ const STATUS_CATEGORY_ORDER = ['サマリー', '治療', '症状', '生活'];
 /* このカテゴリは、一定日数 言及がなければ自動で「いまの状態」から隠す（落ち着いたとみなす） */
 const STATUS_AGING_CATEGORIES = ['症状', '生活'];
 const STATUS_FRESH_DAYS = 7;
+/* カテゴリ内の項目の並び順（大事な順）。ここに無い項目は後ろに回す */
+const STATUS_ITEM_ORDER = {
+  '治療': ['抗がん剤内服', 'ステロイド内服', '輸血', 'カロリーUP点滴', 'カリウム点滴', 'リハビリ'],
+};
 
 function parseYmd(v) {
   const m = String(v ?? '').match(/(\d{4})-(\d{1,2})-(\d{1,2})/);
@@ -151,6 +155,14 @@ function renderStatus(rows) {
   ].filter(c => groups[c]);
 
   box.innerHTML = cats.map(cat => {
+    // カテゴリ内を「大事な順」に並べ替え（指定が無い項目は後ろ）
+    const pri = STATUS_ITEM_ORDER[cat];
+    if (pri) {
+      groups[cat].sort((a, b) => {
+        const ia = pri.indexOf(a['項目']); const ib = pri.indexOf(b['項目']);
+        return (ia < 0 ? 999 : ia) - (ib < 0 ? 999 : ib);
+      });
+    }
     const items = groups[cat].map(r => {
       const upd = r['更新日時']
         ? `<span class="kv-upd">（${esc(formatDate(r['更新日時']))}更新）</span>`
