@@ -101,7 +101,7 @@ function render(data) {
   renderLab(data.labResults || []);
   renderRules(data.rules || []);
   renderLog(data.log || []);
-  renderLastUpdated(data.log || []);
+  renderLastUpdated(data);
 }
 
 function esc(s) {
@@ -240,10 +240,24 @@ function renderLog(rows) {
   ).join('');
 }
 
-function renderLastUpdated(log) {
-  if (!log.length) return;
-  const last = log[log.length - 1];
-  document.getElementById('lastUpdated').textContent = '最終更新：' + formatDateTime(last['日時']);
+function renderLastUpdated(data) {
+  // 全シートの「日時」「更新日時」から一番新しいものを探す。
+  // → ログ・状態・採血・スケジュール・ルールのどこを更新しても自動で最終更新に反映される。
+  const stamps = [];
+  (data.log || []).forEach(r => stamps.push(r['日時']));
+  ['status', 'schedule', 'labResults', 'rules'].forEach(key =>
+    (data[key] || []).forEach(r => stamps.push(r['更新日時']))
+  );
+  let best = null;
+  stamps.forEach(v => {
+    const m = String(v ?? '').match(/(\d{4})-(\d{1,2})-(\d{1,2})(?:[ T](\d{1,2}):(\d{2}))?/);
+    if (!m) return;
+    const d = new Date(+m[1], +m[2] - 1, +m[3], +(m[4] || 0), +(m[5] || 0));
+    if (!best || d > best.d) best = { d, v };
+  });
+  if (best) {
+    document.getElementById('lastUpdated').textContent = '最終更新：' + formatDateTime(best.v);
+  }
 }
 
 /* ===== 補助 ===== */
