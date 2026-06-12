@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('password').addEventListener('keydown', e => {
     if (e.key === 'Enter') onLogin();
   });
+  setupPasswordField();
   document.getElementById('logoutBtn').addEventListener('click', logout);
 
   // GAS 未接続ならサンプルデータでプレビュー表示
@@ -65,9 +66,91 @@ function logout() {
 }
 
 function onLogin() {
-  const pw = document.getElementById('password').value.trim();
+  const el = document.getElementById('password');
+  const pw = (el.__getReal ? el.__getReal() : el.value).trim();
   if (!pw) return;
   loadData(pw, true);
+}
+
+/* 合言葉入力：実値はJSで保持し、表示は「●…●＋最後に打った1文字（約1秒）」。
+   目アイコンで全表示トグル。実値は onLogin が input.__getReal() で読む。
+   ※ラテン文字の合言葉を想定。日本語IME変換中の逐次伏字は対象外（軽微な既知制約）。 */
+function setupPasswordField() {
+  const input = document.getElementById('password');
+  const toggle = document.getElementById('pwToggle');
+  if (!input || !toggle) return;
+
+  let real = '';            // 実際の入力値
+  let reveal = false;       // 目トグル（全表示）
+  let peekIndex = -1;       // 一時的に実文字を見せる位置（最後に打った文字）
+  let peekTimer = null;
+
+  input.__getReal = () => real;
+
+  function paint(caret) {
+    if (reveal) {
+      input.value = real;
+    } else {
+      let s = '';
+      for (let i = 0; i < real.length; i++) s += (i === peekIndex ? real[i] : '●');
+      input.value = s;
+    }
+    if (caret != null) input.setSelectionRange(caret, caret);
+  }
+
+  function schedulePeekClear() {
+    clearTimeout(peekTimer);
+    peekTimer = setTimeout(() => {
+      peekIndex = -1;
+      if (!reveal) paint(input.selectionStart);
+    }, 1000);
+  }
+
+  input.addEventListener('beforeinput', (e) => {
+    const start = input.selectionStart;
+    const end = input.selectionEnd;
+    const t = e.inputType;
+
+    if (t === 'insertText' || t === 'insertFromPaste' || t === 'insertReplacementText' ||
+        t === 'insertFromDrop' || t === 'insertCompositionText') {
+      const data = e.data != null ? e.data : '';
+      real = real.slice(0, start) + data + real.slice(end);
+      const caret = start + data.length;
+      peekIndex = caret - 1;            // 最後に入った1文字だけ見せる
+      e.preventDefault();
+      paint(caret);
+      schedulePeekClear();
+    } else if (t === 'deleteContentBackward') {
+      const from = (start === end) ? Math.max(0, start - 1) : start;
+      real = real.slice(0, from) + real.slice(end);
+      peekIndex = -1;
+      e.preventDefault();
+      paint(from);
+    } else if (t === 'deleteContentForward') {
+      const to = (start === end) ? start + 1 : end;
+      real = real.slice(0, start) + real.slice(to);
+      peekIndex = -1;
+      e.preventDefault();
+      paint(start);
+    } else if (t === 'deleteByCut' || t === 'deleteByDrag' || t === 'deleteContent') {
+      real = real.slice(0, start) + real.slice(end);
+      peekIndex = -1;
+      e.preventDefault();
+      paint(start);
+    }
+    // それ以外の inputType は既定にまかせない（伏字とズレないよう上記で網羅）
+  });
+
+  toggle.addEventListener('click', () => {
+    reveal = !reveal;
+    toggle.textContent = reveal ? '🙈' : '👁';
+    toggle.setAttribute('aria-pressed', String(reveal));
+    toggle.setAttribute('aria-label', reveal ? '合言葉を隠す' : '合言葉を表示');
+    clearTimeout(peekTimer);
+    peekIndex = -1;
+    paint(real.length);
+    input.focus();
+  });
 }
 
 /* ===== データ取得 ===== */
@@ -252,16 +335,35 @@ function ymdKey(v) {
   return m ? `${m[1]}-${String(+m[2]).padStart(2, '0')}-${String(+m[3]).padStart(2, '0')}` : '';
 }
 
-/* ログ用の状態（もっと見るで増やす現在の表示件数を保持） */
-let logSorted = [];
+/* ログ用の状態（もっと見るで増やす現在の表示日数を保持） */
+let logGroups = [];
 let logPhotos = [];
 let logShownCount = 0;
 
-function logItemHtml(r) {
-  // その日の写真を番号順に並べてログの下に表示
-  const dateKey = ymdKey(r['日時']);
+/* 同じ日の複数行を1日ぶんにまとめる。日グループは新しい日が先頭、
+   日内は古い順（朝→夜）で上から読めるようにする。
+   ※rows は新しい行が先（シートは新規を一番上に積む＝append/insertRowAfter(1)）。
+     よって日内は reverse で古い順になる。ログ書き込みは必ず append を使うこと。 */
+function groupLogByDay(rows) {
+  const groups = [];
+  const indexByKey = {};
+  rows.forEach(r => {
+    const key = ymdKey(r['日時']);
+    if (indexByKey[key] == null) {
+      indexByKey[key] = groups.length;
+      groups.push({ key, date: r['日時'], entries: [] });
+    }
+    groups[indexByKey[key]].entries.push(r['内容']);
+  });
+  groups.forEach(g => g.entries.reverse());  // 日内を古い順（朝→夜）に
+  return groups;
+}
+
+/* 1日ぶん（日付見出し＋複数の本文＋その日の写真1セット）を描画 */
+function dayGroupHtml(group) {
+  // その日の写真を番号順に並べて、その日の最後にまとめて1回だけ表示
   const dayPhotos = (logPhotos || [])
-    .filter(p => ymdKey(p.date) === dateKey)
+    .filter(p => ymdKey(p.date) === group.key)
     .sort((a, b) => (a.order || 0) - (b.order || 0));
   const photoHtml = dayPhotos.length
     ? `<div class="log-photos">` + dayPhotos.map(p =>
@@ -271,25 +373,28 @@ function logItemHtml(r) {
         `</figure>`
       ).join('') + `</div>`
     : '';
-  return `<div class="log-item"><span class="log-date">${esc(formatDateTime(r['日時']))}</span>　${esc(r['内容'])}${photoHtml}</div>`;
+  const entriesHtml = group.entries
+    .map(c => `<p class="log-entry">${esc(c)}</p>`).join('');
+  return `<div class="log-item"><span class="log-date">${esc(formatDateTime(group.date))}</span>${entriesHtml}${photoHtml}</div>`;
 }
 
 function renderLog(rows, photos) {
   const box = document.getElementById('logBody');
   if (!rows.length) { box.innerHTML = '<p class="empty">記録はまだありません。</p>'; return; }
-  logSorted = [...rows].sort((a, b) => String(b['日時']).localeCompare(String(a['日時'])));
+  const sorted = [...rows].sort((a, b) => String(b['日時']).localeCompare(String(a['日時'])));
   logPhotos = photos || [];
-  logShownCount = LOG_PAGE_SIZE;   // 初期表示
+  logGroups = groupLogByDay(sorted);  // 同じ日をまとめる
+  logShownCount = LOG_PAGE_SIZE;       // 初期表示（日数）
   paintLog();
 }
 
-/* 現在の表示件数ぶんを描画し、続きがあれば「もっと見る」ボタンを出す */
+/* 現在の表示日数ぶんを描画し、続きがあれば「もっと見る」ボタンを出す */
 function paintLog() {
   const box = document.getElementById('logBody');
-  const shown = logSorted.slice(0, logShownCount);
-  let html = shown.map(logItemHtml).join('');
+  const shown = logGroups.slice(0, logShownCount);
+  let html = shown.map(dayGroupHtml).join('');
 
-  const remaining = logSorted.length - shown.length;
+  const remaining = logGroups.length - shown.length;
   if (remaining > 0) {
     html += `<button type="button" class="log-more" id="logMoreBtn">もっと見る（あと${remaining}日分）</button>`;
   }

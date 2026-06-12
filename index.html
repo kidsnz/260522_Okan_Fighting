@@ -18,7 +18,12 @@
       <img src="images/group_people.png" class="login-illust" alt="">
       <h1>おかん、ガンバレ！</h1>
       <p class="login-note">合言葉を入力してください</p>
-      <input type="password" id="password" placeholder="合言葉" autocomplete="current-password">
+      <div class="pw-field">
+        <input type="text" id="password" placeholder="合言葉"
+               autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+        <button type="button" id="pwToggle" class="pw-toggle"
+                aria-label="合言葉を表示" aria-pressed="false">👁</button>
+      </div>
       <button id="loginBtn">ひらく</button>
       <p id="loginError" class="login-error"></p>
     </div>

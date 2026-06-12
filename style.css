@@ -37,9 +37,17 @@ body {
 .login-note { font-size: 0.9rem; color: var(--ink-soft); margin-bottom: 1rem; }
 .login-card input {
   width: 100%; padding: 0.85rem; font-size: 1rem; text-align: center;
-  border: 2px solid var(--line); border-radius: 0.85rem; margin-bottom: 1rem;
+  border: 2px solid var(--line); border-radius: 0.85rem;
 }
 .login-card input:focus { outline: none; border-color: var(--accent); }
+/* 合言葉欄＋目アイコン */
+.pw-field { position: relative; margin-bottom: 1rem; }
+.pw-field input { padding-right: 2.8rem; padding-left: 2.8rem; } /* 左右対称で中央寄せを保つ */
+.pw-toggle {
+  position: absolute; right: 0.55rem; top: 50%; transform: translateY(-50%);
+  background: none; border: none; padding: 0.25rem; line-height: 1;
+  font-size: 1.2rem; cursor: pointer;
+}
 #loginBtn {
   width: 100%; padding: 0.85rem; font-size: 1rem; font-weight: 700;
   background: var(--accent); color: #fff; border: none; border-radius: 0.85rem;
@@ -135,7 +143,10 @@ th { color: var(--ink-soft); font-weight: 600; }
   padding: 0.32rem 0; border-bottom: 1px dashed var(--line);
 }
 .log-item:last-child { border-bottom: none; }
-.log-date { color: var(--ink-soft); }
+.log-date { display: block; color: var(--ink-soft); font-weight: 700; margin-bottom: 0.2rem; }
+/* 同じ日に複数の記録があるとき、改行して1日の中に並べる */
+.log-entry { margin: 0 0 0.3rem; }
+.log-entry:last-of-type { margin-bottom: 0; }
 
 /* もっと見るボタン */
 .log-more {
