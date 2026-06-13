@@ -6,6 +6,8 @@ const GAS_URL = 'https://script.google.com/macros/s/AKfycbx6JyFkScT1j4QY13L2Sf21
 
 const AUTH_KEY = 'okan_ganbare_auth';
 const AUTH_DAYS = 30;
+/* 前回取得したデータの保存先。再訪時はこれを即表示し、裏で最新に差し替える（体感を速く）。 */
+const DATA_CACHE_KEY = 'okan_ganbare_data';
 
 /* 毎日の様子（ログ）の表示件数。
    初期表示も「もっと見る」で増える件数も、両方この数字。ここを変えるだけでOK。 */
@@ -28,7 +30,16 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   const saved = getSavedAuth();
-  if (saved) loadData(saved);
+  if (saved) {
+    // 前回データがあれば即表示（待たせない）→ そのうえで裏で最新を取りに行く
+    const cached = getCachedData();
+    if (cached) {
+      render(cached);
+      document.getElementById('login').hidden = true;
+      document.getElementById('app').hidden = false;
+    }
+    loadData(saved, { silent: !!cached });
+  }
 });
 
 function showPreview(data) {
@@ -62,14 +73,26 @@ function saveAuth(password) {
 
 function logout() {
   localStorage.removeItem(AUTH_KEY);
+  localStorage.removeItem(DATA_CACHE_KEY);
   location.reload();
+}
+
+/* 前回取得データのキャッシュ（再訪時の即時表示用） */
+function getCachedData() {
+  try {
+    const raw = localStorage.getItem(DATA_CACHE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch { return null; }
+}
+function setCachedData(data) {
+  try { localStorage.setItem(DATA_CACHE_KEY, JSON.stringify(data)); } catch {}
 }
 
 function onLogin() {
   const el = document.getElementById('password');
   const pw = (el.__getReal ? el.__getReal() : el.value).trim();
   if (!pw) return;
-  loadData(pw, true);
+  loadData(pw, { fromLogin: true });
 }
 
 /* 合言葉入力：実値はJSで保持し、表示は「●…●＋最後に打った1文字（約1秒）」。
@@ -154,9 +177,11 @@ function setupPasswordField() {
 }
 
 /* ===== データ取得 ===== */
-async function loadData(password, fromLogin) {
+async function loadData(password, opts) {
+  // opts: { fromLogin?:bool, silent?:bool }。silent=裏での再取得（既にキャッシュ表示済み）。
+  const o = opts || {};
   const errEl = document.getElementById('loginError');
-  if (fromLogin) errEl.textContent = '読み込み中...';
+  if (o.fromLogin) errEl.textContent = '読み込み中...';
   try {
     const res = await fetch(GAS_URL, {
       method: 'POST',
@@ -165,19 +190,25 @@ async function loadData(password, fromLogin) {
     const data = await res.json();
     if (!data.ok) {
       if (data.error === 'auth') {
-        errEl.textContent = '合言葉が違うようです。';
+        // 合言葉が変わった等。キャッシュ表示中でもログイン画面に戻す。
         localStorage.removeItem(AUTH_KEY);
-      } else {
+        localStorage.removeItem(DATA_CACHE_KEY);
+        document.getElementById('app').hidden = true;
+        document.getElementById('login').hidden = false;
+        errEl.textContent = '合言葉が違うようです。';
+      } else if (!o.silent) {
         errEl.textContent = 'エラー: ' + (data.error || '不明');
       }
       return;
     }
     saveAuth(password);
+    setCachedData(data);          // 次回の即時表示用に保存
     render(data);
     document.getElementById('login').hidden = true;
     document.getElementById('app').hidden = false;
   } catch (e) {
-    errEl.textContent = '接続できませんでした。通信環境を確認してください。';
+    // 裏での再取得中の通信エラーは、表示中のキャッシュをそのまま残して黙る
+    if (!o.silent) errEl.textContent = '接続できませんでした。通信環境を確認してください。';
   }
 }
 
@@ -202,7 +233,7 @@ const STATUS_AGING_CATEGORIES = ['症状', '生活'];
 const STATUS_FRESH_DAYS = 7;
 /* カテゴリ内の項目の並び順（大事な順）。ここに無い項目は後ろに回す */
 const STATUS_ITEM_ORDER = {
-  '治療': ['抗がん剤内服', 'ステロイド内服', '輸血', 'カロリーUP点滴', 'カリウム点滴', 'リハビリ'],
+  '治療': ['抗がん剤内服', '点滴', 'ステロイド内服', '輸血', '眠剤'],
 };
 
 function parseYmd(v) {
